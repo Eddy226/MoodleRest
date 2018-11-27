@@ -246,34 +246,40 @@ public class MoodleCourse implements Serializable {
      * @param content String
      */
     public void setMoodleCourseField(String nodeName, String content) {
-        if (nodeName.equals("id")) setId(Long.parseLong(content.trim()));
-        if (nodeName.equals("shortname")) setShortname(content);
-        if (nodeName.equals("categoryid")) setCategoryId(Long.parseLong(content.trim()));
-        if (nodeName.equals("categorysortorder")) setCategorySortOrder(Integer.parseInt(content.trim()));
-        if (nodeName.equals("fullname")) setFullname(content);
-        if (nodeName.equals("idnumber")) setIdNumber(content);
-        if (nodeName.equals("summary")) setSummary(content);
-        if (nodeName.equals("summaryformat")) setSummaryFormat(Integer.parseInt(content));
-        if (nodeName.equals("format")) setFormat(content);
-        if (nodeName.equals("showgrades")) setShowGrades(Integer.parseInt(content));
-        if (nodeName.equals("newsitems")) setNewsItems(Integer.parseInt(content));
-        if (nodeName.equals("startdate")) setStartDate(Long.parseLong(content.trim()));
-        if (nodeName.equals("numsections")) setNumSections(Integer.parseInt(content));
-        if (nodeName.equals("maxbytes")) setMaxBytes(Long.parseLong(content.trim()));
-        if (nodeName.equals("showreports")) setShowReports(Integer.parseInt(content));
-        if (nodeName.equals("visible")) setVisible(Integer.parseInt(content)==0?COURSE_VISIBLE_TO_STUDENTS_NO:COURSE_VISIBLE_TO_STUDENTS_YES);
-        if (nodeName.equals("hiddensections") && !content.isEmpty()) setHiddenSections(Integer.parseInt(content));
-        if (nodeName.equals("groupmode")) setGroupMode(Integer.parseInt(content));
-        if (nodeName.equals("groupmodeforce")) setGroupModeForce(Integer.parseInt(content));
-        if (nodeName.equals("defaultgroupingid")) setDefaultGroupingId(Long.parseLong(content.trim()));
-        if (nodeName.equals("timecreated")) setTimeCreated(Long.parseLong(content.trim()));
-        if (nodeName.equals("timemodified")) setTimeModified(Long.parseLong(content.trim()));
-        if (nodeName.equals("enablecompletion")) setEnableCompletion(Integer.parseInt(content)==0?COMPLETION_DISABLED:COMPLETION_ENABLED);
-        if (nodeName.equals("completionstartonenrol")) setCompletionStartOnEnrol(Integer.parseInt(content)==0?COMPLETION_ON_ENROLL_DISABLED:COMPLETION_ON_ENROLL_ENABLED);
-        if (nodeName.equals("completionnotify")) setCompletionNotify(Integer.parseInt(content)==0?COMPLETION_NOTIFY_DISABLED:COMPLETION_NOTIFY_ENABLED);
-        if (nodeName.equals("lang")) setLang(content);
-        if (nodeName.equals("forcetheme")) setForceTheme(content);
-        if (nodeName.equals("enrolledusercount")) setEnrolledUserCount(Long.parseLong(content.trim())); 
+        if ( content != null && ! content.isEmpty() ) {
+            if (nodeName.equals("id")) setId(Long.parseLong(content.trim()));
+            if (nodeName.equals("shortname")) setShortname(content);
+            if (nodeName.equals("categoryid")) setCategoryId(Long.parseLong(content.trim()));
+            if (nodeName.equals("categorysortorder")) setCategorySortOrder(Integer.parseInt(content.trim()));
+            if (nodeName.equals("fullname")) setFullname(content);
+            if (nodeName.equals("idnumber")) setIdNumber(content);
+            if (nodeName.equals("summary")) setSummary(content);
+            if (nodeName.equals("summaryformat")) setSummaryFormat(Integer.parseInt(content));
+            if (nodeName.equals("format")) setFormat(content);
+            if (nodeName.equals("showgrades")) setShowGrades(Integer.parseInt(content));
+            if (nodeName.equals("newsitems")) setNewsItems(Integer.parseInt(content));
+            if (nodeName.equals("startdate")) setStartDate(Long.parseLong(content.trim()));
+            if (nodeName.equals("numsections")) setNumSections(Integer.parseInt(content));
+            if (nodeName.equals("maxbytes")) setMaxBytes(Long.parseLong(content.trim()));
+            if (nodeName.equals("showreports")) setShowReports(Integer.parseInt(content));
+            if (nodeName.equals("visible"))
+                setVisible(Integer.parseInt(content) == 0 ? COURSE_VISIBLE_TO_STUDENTS_NO : COURSE_VISIBLE_TO_STUDENTS_YES);
+            if (nodeName.equals("hiddensections") && !content.isEmpty()) setHiddenSections(Integer.parseInt(content));
+            if (nodeName.equals("groupmode")) setGroupMode(Integer.parseInt(content));
+            if (nodeName.equals("groupmodeforce")) setGroupModeForce(Integer.parseInt(content));
+            if (nodeName.equals("defaultgroupingid")) setDefaultGroupingId(Long.parseLong(content.trim()));
+            if (nodeName.equals("timecreated")) setTimeCreated(Long.parseLong(content.trim()));
+            if (nodeName.equals("timemodified")) setTimeModified(Long.parseLong(content.trim()));
+            if (nodeName.equals("enablecompletion"))
+                setEnableCompletion(Integer.parseInt(content) == 0 ? COMPLETION_DISABLED : COMPLETION_ENABLED);
+            if (nodeName.equals("completionstartonenrol"))
+                setCompletionStartOnEnrol(Integer.parseInt(content) == 0 ? COMPLETION_ON_ENROLL_DISABLED : COMPLETION_ON_ENROLL_ENABLED);
+            if (nodeName.equals("completionnotify"))
+                setCompletionNotify(Integer.parseInt(content) == 0 ? COMPLETION_NOTIFY_DISABLED : COMPLETION_NOTIFY_ENABLED);
+            if (nodeName.equals("lang")) setLang(content);
+            if (nodeName.equals("forcetheme")) setForceTheme(content);
+            if (nodeName.equals("enrolledusercount")) setEnrolledUserCount(Long.parseLong(content.trim()));
+        }
     }
 
   public OptionParameter[] getCourseformatoptions() {
