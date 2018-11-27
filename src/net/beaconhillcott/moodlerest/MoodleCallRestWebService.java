@@ -21,7 +21,12 @@ package net.beaconhillcott.moodlerest;
 import java.io.*;
 import java.net.*;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.logging.*;
+import javax.net.ssl.*;
 import javax.xml.xpath.*;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -65,7 +70,7 @@ public class MoodleCallRestWebService implements Serializable {
      */
     public static void init(String url, String token) {
         MoodleCallRestWebService.token=token;
-        MoodleCallRestWebService.url=url;
+        init(url);
     }
     
     /**
@@ -80,7 +85,7 @@ public class MoodleCallRestWebService implements Serializable {
      */
     public static void init(String url, String token, boolean legacy) {
         MoodleCallRestWebService.token=token;
-        MoodleCallRestWebService.url=url;
+        init(url);
         MoodleCallRestWebService.legacy=legacy;
     }
 
@@ -96,7 +101,7 @@ public class MoodleCallRestWebService implements Serializable {
     public static void init(String url, String username, String password) {
         MoodleCallRestWebService.username=username;
         MoodleCallRestWebService.password=password;
-        MoodleCallRestWebService.url=url;
+        init(url);
     }
     
     /**
@@ -113,8 +118,27 @@ public class MoodleCallRestWebService implements Serializable {
     public static void init(String url, String username, String password, boolean legacy) {
         MoodleCallRestWebService.username=username;
         MoodleCallRestWebService.password=password;
-        MoodleCallRestWebService.url=url;
+        init(url);
         MoodleCallRestWebService.legacy=legacy;
+    }
+
+    /**Initialization of the url and the TLS Moodle connection if necessary
+     * @param url String
+     */
+    private static void init(String url)
+    {
+        MoodleCallRestWebService.url=url;
+        if ( MoodleCallRestWebService.url.toLowerCase().startsWith("https") )
+        {
+            // Compatibility Java 7
+            System.setProperty("https.protocols", "TLSv1.1,TLSv1.2");
+
+            // For development, accept all servers
+            X509TrustManager trustManager = TrustAllX509TrustManager.INSTANCE;
+            SSLContext sslContext = sslContext(null, new TrustManager[]{trustManager});
+            HttpsURLConnection.setDefaultHostnameVerifier(getAllowAllHostNames());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+        }
     }
 
     /**
@@ -255,7 +279,11 @@ public class MoodleCallRestWebService implements Serializable {
             URL getUrl = new URL(url);
             if (debug)
               System.out.println(url+"?"+params);
-            HttpURLConnection connection = (HttpURLConnection)getUrl.openConnection();
+            HttpURLConnection connection;
+            if ( MoodleCallRestWebService.url.toLowerCase().startsWith("https") )
+                connection = (HttpsURLConnection)getUrl.openConnection();
+            else
+                connection = (HttpURLConnection)getUrl.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Accept", "application/xml");
             connection.setDoOutput(true);
@@ -342,7 +370,11 @@ public class MoodleCallRestWebService implements Serializable {
             URL getUrl = new URL(url);
             if (debug)
               System.out.println(url+"?"+params);
-            HttpURLConnection connection = (HttpURLConnection)getUrl.openConnection();
+            HttpURLConnection connection;
+            if ( MoodleCallRestWebService.url.toLowerCase().startsWith("https") )
+                connection = (HttpsURLConnection)getUrl.openConnection();
+            else
+                connection = (HttpURLConnection)getUrl.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Accept", "application/xml");
             connection.setDoOutput(true);
@@ -412,5 +444,55 @@ public class MoodleCallRestWebService implements Serializable {
             Logger.getLogger(MoodleCallRestWebService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return elements;
+    }
+
+    /**Initialization of TLS context
+     * @param keyManagers KeyManager
+     * @param trustManagers TrustManager
+     * @return SSLContext */
+    private static SSLContext sslContext(KeyManager[] keyManagers, TrustManager[] trustManagers)
+    {
+        try
+        {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(keyManagers, trustManagers, null);
+            return sslContext;
+        }
+        catch (NoSuchAlgorithmException | KeyManagementException e)
+        {
+            throw new IllegalStateException("Couldn't init TLS context", e);
+        }
+    }
+
+    /**Hostname filter for TLS connecion*/
+    private static HostnameVerifier getAllowAllHostNames()
+    {
+        return new HostnameVerifier()
+        {
+            @Override
+            public boolean verify(String s, SSLSession sslSession)
+            {
+                // TODO apply your rules
+                return true;
+            }
+        };
+    }
+
+    /**TructManager for development environment*/
+    private static class TrustAllX509TrustManager implements X509TrustManager
+    {
+        public static final X509TrustManager INSTANCE = new TrustAllX509TrustManager();
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException { }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException { }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers()
+        {
+            return new X509Certificate[0];
+        }
     }
 }
